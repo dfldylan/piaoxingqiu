@@ -11,6 +11,7 @@ want_buy_count = config.buy_count
 audience_idx = config.audience_idx
 deliver_method = config.deliver_method
 acceptable_price = [2380, 1280]
+timeout = 0.1
 
 # 准备阶段：获取观演人信息
 while True:
@@ -24,7 +25,7 @@ while True:
             raise Exception('audience_ids is null')
     except Exception as e:
         print('获取观演人信息:', e)
-        time.sleep(0.1)
+        time.sleep(timeout)
         continue
 
 # 准备阶段：获取默认收货地址
@@ -36,13 +37,14 @@ while True:
         receiver = address["username"]  # 收件人
         cellphone = address["cellphone"]  # 电话
         detail_address = address["detailAddress"]  # 详细地址
+        print('address:', address)
         break
     except Exception as e:
         print('获取默认收货地址:', e)
-        time.sleep(0.1)
+        time.sleep(timeout)
         continue
 
-time.sleep(0.1)
+time.sleep(timeout)
 
 while True:
     # 第一阶段：session_id_list
@@ -57,16 +59,12 @@ while True:
         print('session_id_list: ', session_id_list)
         if len(session_id_list) == 0:
             raise Exception('session_id_list is null')
-            # if session_id:
-            #     break
-            # else:
-            #     print("未获取到在售状态且符合购票数量需求的session_id")
     except Exception as e:
         print(e)
-        time.sleep(0.1)
+        time.sleep(timeout)
         continue
 
-    time.sleep(0.1)
+    time.sleep(timeout)
 
     for session_id in session_id_list:
         print('session_id: ', session_id)
@@ -84,10 +82,10 @@ while True:
                 raise Exception('seat_plan_id_list is null')
         except Exception as e:
             print(e)
-            time.sleep(0.1)
+            time.sleep(timeout)
             continue
 
-        time.sleep(0.1)
+        time.sleep(timeout)
 
         # 第三阶段：order_list
         try:
@@ -108,10 +106,10 @@ while True:
                 raise Exception('order_list is null')
         except Exception as e:
             print(e)
-            time.sleep(0.1)
+            time.sleep(timeout)
             continue
 
-        time.sleep(0.1)
+        time.sleep(timeout)
 
         for order in order_list:
             [seat_plan_id, price, buy_count] = order
@@ -121,7 +119,7 @@ while True:
                     print("deliver_method:" + deliver_method)
                 except:
                     print("get deliver_method failed")
-                    time.sleep(0.1)
+                    time.sleep(timeout)
                     continue
 
             # 第四阶段：
@@ -155,5 +153,5 @@ while True:
                         exit(-1)
             except Exception as e:
                 print(e)
-                time.sleep(0.1)
+                time.sleep(timeout)
                 continue
