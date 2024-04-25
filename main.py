@@ -11,7 +11,7 @@ want_buy_count = config.buy_count
 audience_idx = config.audience_idx
 deliver_method = config.deliver_method
 acceptable_price = [2380, 1280]
-timeout = 0.1
+timeout = 1
 
 # 准备阶段：获取观演人信息
 while True:
@@ -46,8 +46,8 @@ while True:
 
 time.sleep(timeout)
 
+# 第一阶段：session_id_list
 while True:
-    # 第一阶段：session_id_list
     try:
         sessions = request.get_sessions(show_id)
         session_id_list = []
@@ -59,13 +59,15 @@ while True:
         print('session_id_list: ', session_id_list)
         if len(session_id_list) == 0:
             raise Exception('session_id_list is null')
+        break
     except Exception as e:
         print(e)
         time.sleep(timeout)
         continue
 
-    time.sleep(timeout)
+time.sleep(timeout)
 
+while True:
     for session_id in session_id_list:
         print('session_id: ', session_id)
         # 第二阶段：seat_plan_id_list

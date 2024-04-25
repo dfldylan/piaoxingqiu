@@ -1,10 +1,12 @@
 import requests
 
 from config import token
+from typing import Optional, List, Dict
+
 
 
 # 根据项目id获取所有场次和在售状态
-def get_sessions(show_id) -> list | None:
+def get_sessions(show_id) -> Optional[List]:
     headers = {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Mobile Safari/537.36',
         'Content-Type': 'application/json'
@@ -83,7 +85,7 @@ def get_deliver_method(show_id, session_id, seat_plan_id, price: int, qty: int) 
 
 
 # 获取观演人信息
-def get_audiences() -> list | None:
+def get_audiences() -> Optional[List]:
     headers = {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Mobile Safari/537.36',
         'Content-Type': 'application/json',
@@ -99,7 +101,7 @@ def get_audiences() -> list | None:
 
 
 # 获取收货地址
-def get_address() -> dict | None:
+def get_address() -> Optional[Dict]:
     headers = {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Mobile Safari/537.36',
         'Content-Type': 'application/json',
