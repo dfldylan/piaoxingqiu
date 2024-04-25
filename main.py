@@ -1,7 +1,8 @@
 import time
-
+import random
 import request
 import config
+from pushplus import send_wechat_message
 
 '''
 目前仅支持【无需选座】的项目
@@ -11,7 +12,7 @@ want_buy_count = config.buy_count
 audience_idx = config.audience_idx
 deliver_method = config.deliver_method
 acceptable_price = [2380, 1280]
-timeout = 1
+timeout = 0.5
 
 # 准备阶段：获取观演人信息
 while True:
@@ -25,7 +26,7 @@ while True:
             raise Exception('audience_ids is null')
     except Exception as e:
         print('获取观演人信息:', e)
-        time.sleep(timeout)
+        time.sleep(timeout * random.random() + 0.5)
         continue
 
 # 准备阶段：获取默认收货地址
@@ -53,21 +54,20 @@ while True:
         session_id_list = []
         if sessions:
             for i in sessions:
-                if i["sessionStatus"] == 'ON_SALE':
+                print(i["sessionStatus"], end=', ')
+                if i["sessionStatus"] == 'ON_SALE' or i["sessionStatus"] == 'PRE_SALE':
                     session_id = i["bizShowSessionId"]
                     session_id_list.append(session_id)
         print('session_id_list: ', session_id_list)
         if len(session_id_list) == 0:
             raise Exception('session_id_list is null')
-        break
     except Exception as e:
-        print(e)
+        print(e,time.strftime("%H:%M:%S"))
         time.sleep(timeout)
         continue
 
-time.sleep(timeout)
+    time.sleep(timeout)
 
-while True:
     for session_id in session_id_list:
         print('session_id: ', session_id)
         # 第二阶段：seat_plan_id_list
@@ -77,7 +77,7 @@ while True:
             for price in acceptable_price:
                 for j in seat_plans:
                     if j["originalPrice"] == price:
-                        seat_plan_id_list.append([j["seatPlanId"],j["originalPrice"]])
+                        seat_plan_id_list.append([j["seatPlanId"], j["originalPrice"]])
                         break
             print('seat_plan_id_list: ', seat_plan_id_list)
             if len(seat_plan_id_list) == 0:
@@ -94,7 +94,7 @@ while True:
             seat_count = request.get_seat_count(show_id, session_id)
             order_list = []
             for j in range(len(seat_plan_id_list)):
-                [seat_plan_id,price] = seat_plan_id_list[j]
+                [seat_plan_id, price] = seat_plan_id_list[j]
                 for i in seat_count:
                     if i["seatPlanId"] == seat_plan_id:
                         print(f'seat_plan_id: {seat_plan_id}, price: {price}, remain: {i["canBuyCount"]}')
@@ -145,13 +145,16 @@ while True:
                         request.create_order(show_id, session_id, seat_plan_id, price, buy_count, deliver_method,
                                              express_fee["priceItemVal"], receiver, cellphone, address_id,
                                              detail_address, location_city_id, audience_ids)
+                        send_wechat_message('抢票成功')
                         exit(0)
-                    elif deliver_method == "VENUE" or deliver_method == "E_TICKET":
+                    elif deliver_method == "VENUE" or deliver_method == "E_TICKET" or deliver_method == "ID_CARD":
                         request.create_order(show_id, session_id, seat_plan_id, price, buy_count, deliver_method, 0,
                                              None, None, None, None, None, audience_ids)
+                        send_wechat_message('抢票成功')
                         exit(0)
                     else:
                         print("不支持的deliver_method:" + deliver_method)
+                        send_wechat_message('抢票失败')
                         exit(-1)
             except Exception as e:
                 print(e)
